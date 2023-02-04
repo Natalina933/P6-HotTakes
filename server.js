@@ -1,18 +1,27 @@
-const dotenv = require('dotenv')
-dotenv.config()
 const express = require("express");
 const http = require("http");
 const mongoose = require("mongoose");
 const app = express();
-app.get("/", (req, res) => {
-  res.send("hello world");
-});
-mongoose.connect(process.env.mongodb_URL,
-  { useNewUrlParser: true,
-    useUnifiedTopology: true })
-  .then(() => console.log('Connexion à MongoDB réussie !'))
-  .catch(() => console.log('Connexion à MongoDB échouée !'));
+const authRouter = require("./routes/authRoutes");
+const cors=require("cors")
+app.use(cors())
+app.use(express.json());
+app.use(
+  express.urlencoded({
+    extended: true,
+  })
+);
+app.use("/api/auth", authRouter);
 
+mongoose
+  .connect(process.env.mongodb_URL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("Connexion à MongoDB réussie !"))
+  .catch(() => console.log("Connexion à MongoDB échouée !"));
+
+/****************return of a valid port provided in the form of a number or a string**************/
 const normalizePort = (val) => {
   const port = parseInt(val, 10);
 
@@ -26,7 +35,7 @@ const normalizePort = (val) => {
 };
 const port = normalizePort(process.env.PORT || "3000");
 app.set("port", port);
-
+/****************return of a valid port provided in the form of a number or a string**************/
 const errorHandler = (error) => {
   if (error.syscall !== "listen") {
     throw error;
@@ -47,7 +56,10 @@ const errorHandler = (error) => {
       throw error;
   }
 };
-
+/**
+ * createServer() react to incoming requests and receive as arguments: the object requête/responce/next
+ * production = const server = https.createServer(app);
+ */
 const server = http.createServer(app);
 
 server.on("error", errorHandler);
