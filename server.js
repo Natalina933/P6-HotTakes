@@ -1,20 +1,20 @@
 const express = require("express");
-const http = require("http");
 const mongoose = require("mongoose");
 const app = express();
-const authRouter = require("./routes/authRoutes");
-const cors=require("cors")
-app.use(cors())
-app.use(express.json());
 app.use(
   express.urlencoded({
     extended: true,
   })
 );
-app.use("/api/auth", authRouter);
+app.use(express.json());
+const cors = require("cors");
+app.use(cors());
+
+const authRoutes = require("./routes/authRoutes");
+app.use("/api/auth", authRoutes);
 
 mongoose
-  .connect(process.env.mongodb_URL, {
+  .connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   })
@@ -60,7 +60,7 @@ const errorHandler = (error) => {
  * createServer() react to incoming requests and receive as arguments: the object requête/responce/next
  * production = const server = https.createServer(app);
  */
-const server = http.createServer(app);
+const server = app.listen(port);
 
 server.on("error", errorHandler);
 server.on("listening", () => {
@@ -69,4 +69,3 @@ server.on("listening", () => {
   console.log("Listening on " + bind);
 });
 
-server.listen(port);

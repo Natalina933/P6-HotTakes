@@ -1,25 +1,26 @@
-const User = require("../models/userModel");
-const signup = (req, res, next) => {
-    const user = new User({
-    // créer un nouveau user
-    email: req.body.email, // l'adresse mail
-    password:req.body.password, // le mot de passe haché
+const User = require("../models/UserModel");
+const signup = async (req, res, next) => {
+    const { email, password } = req.body;
+    if (!email || !password) {
+    return res.status(400).json({ message: "email ou mot de passe invalide" });
+    }
+    try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+        return res.status(400).json({ message: "L'utilisateur existe déjà" });
+    }
+
+    const hashPassword = await bcrypt.hash(password, 10);
+    const newUser = new User({
+        email,
+        password: hashPassword,
     });
-    user
-    .save() // et mongoose le stocke dans la bdd
-    .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
-    .catch((error) => res.status(400).json({ error }));
+    await newUser.save();
+    res.status(201).json({ message: "Utilisateur crée avec succès" });
+    } catch (error) {
+    res.status(500).json({ error });
+    }
+    
 };
 
-const login = (req, res, next) => {
-    const user = new User({
-        // créer un nouveau user
-        email: req.body.email, // l'adresse mail
-        password: req.body.password, // le mot de passe haché
-        });
-        user
-        .save() // et mongoose le stocke dans la bdd
-        .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
-        .catch((error) => res.status(400).json({ error }));
-};
-module.exports={signup,login}
+module.exports = { signup };
