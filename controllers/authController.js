@@ -1,16 +1,29 @@
 const User = require("../models/UserModel");
+const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken")
 const signup = async (req, res, next) => {
     const { email, password } = req.body;
     if (!email || !password) {
     return res.status(400).json({ message: "email ou mot de passe invalide" });
     }
     try {
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-        return res.status(400).json({ message: "L'utilisateur existe déjà" });
+    const userIndataBase = await User.findOne({ email });
+    if (userIndataBase) {
+        return res.status(400).json({ message: "Email ou mot de passe invalide" });
     }
+    const arePasswordMatching = await bcrypt.compare(password, userIndataBase.password)
+if (arePasswordMatching){
+    return res.status(400).json({ message: "Email ou mot de passe invalide" });
+}
+const token = jwt.sign({
+    userId:userIndataBase._id
+}, process.env.JWT_SECRET)
 
-    const hashPassword = await bcrypt.hash(password, 10);
+res.status(201).json({ userId:userIndataBase._id,token });
+    
+
+
+const hashPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
         email,
         password: hashPassword,
@@ -23,4 +36,4 @@ const signup = async (req, res, next) => {
     
 };
 
-module.exports = { signup };
+module.exports = { signup,login };
