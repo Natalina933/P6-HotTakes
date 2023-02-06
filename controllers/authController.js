@@ -39,4 +39,4 @@ const hashPassword = await bcrypt.hash(password, 10);
     
 
 
-module.exports = { signup, login };
+module.exports = { signup };
