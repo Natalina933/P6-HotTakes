@@ -10,8 +10,8 @@ exports.createSauce = (req, res, next) => {
     ...sauceObjet,
     userId: req.auth.userId,
     imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-  });
-  sauce.save()
+  });// url de l'image enregistrer dans la bdd et dans le fichier images
+  sauce.save()// la sauce est sauvegardée dans la bdd
   .then(()=>{
     res.status(201).json({message: "Sauce enregistrée !"})
   })

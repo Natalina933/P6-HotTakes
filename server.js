@@ -1,5 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const http = require("http");
 const app = express();
 app.use(
   express.urlencoded({
@@ -13,6 +14,7 @@ app.use(cors());
 const authRoutes = require("./routes/authRoutes");
 app.use("/api/auth", authRoutes);
 
+mongoose.set('strictQuery', false)
 mongoose
   .connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,

@@ -11,8 +11,10 @@ const signup = async (req, res, next) => {
     try {
     const userIndataBase = await User.findOne({ email });
     if (userIndataBase) {
-        return res.status(400).json({ message: "Email ou mot de passe invalide" });
+        return res.status(400).json({ message: "Email existe déjà" });
     }
+
+
     const arePasswordMatching = await bcrypt.compare(password, userIndataBase.password)
 if (arePasswordMatching){
     return res.status(400).json({ message: "Email ou mot de passe invalide" });
