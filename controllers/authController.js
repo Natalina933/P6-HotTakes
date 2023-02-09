@@ -6,21 +6,19 @@ const jwt = require("jsonwebtoken"); // token generator package
 const signup = async (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
+    // véfication de l'email (il faut qu'il soit unique dans la bdd)
     return res.status(400).json({ message: "email ou mot de passe invalide" });
   }
   try {
-    // Inscription Utilisateur
     const hashPassword = await bcrypt.hash(password, 10);
     const newUser = new User({
-      email:email,
+      email: email,
       password: hashPassword,
     });
-    console.log(newUser);
+    // console.log(newUser);
     await newUser.save();
-    res
-      .status(200)
-      .json({message: "Utilisateur créé avec succès",
-      });
+    
+    res.status(200).json({ message: "Utilisateur créé avec succès" });
   } catch (error) {
     console.log(error);
     res.status(500).json({ error });
@@ -30,35 +28,27 @@ const signup = async (req, res, next) => {
 const login = async (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
+    //vérification du mail
     return res.status(400).json({ message: "email ou mot de passe invalide" });
   }
-  try {
-    const userIndataBase = await User.findOne({ email });
-    console.log(userIndataBase);
-    if (!userIndataBase) {
-      return res
-        .status(400)
-        .json({ message: "email ou mot de passe invalide" });
-    }
-    const arePasswordMatching = await bcrypt.compare(
-      password,
-      userIndataBase.password
-    );
-    if (!arePasswordMatching) {
-      return res
-        .status(400)
-        .json({ message: "Email ou mot de passe invalide" });
-    }
-    const token = jwt.sign(
-      {
-        userId: newUser._id,
-      },
-      process.env.JWT_SECRET
-    );
-    res.status(200).json({ message: "Utilisateur Connecté" });
-  } catch (error) {
-    res.status(500).json({ error });
+  const userIndataBase = await User.findOne({ email });
+  if (!userIndataBase) {
+    return res.status(400).json({ message: "email ou mot de passe invalide" });
   }
+  const arePasswordMatching = await bcrypt.compare(
+    password,
+    userIndataBase.password
+  );
+  if (!arePasswordMatching) {
+    return res.status(400).json({ message: "Email ou mot de passe invalide" });
+  }
+  const token = jwt.sign(
+    {
+      userId: userIndataBase._id,
+    },
+    process.env.JWT_SECRET
+  );
+  res.status(200).json({ userId: userIndataBase._id, token });
 };
 
 module.exports = { signup, login };
