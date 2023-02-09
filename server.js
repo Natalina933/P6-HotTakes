@@ -1,6 +1,5 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const http = require("http");
 const app = express();
 app.use(
   express.urlencoded({
@@ -14,7 +13,10 @@ app.use(cors());
 const authRoutes = require("./routes/authRoutes");
 app.use("/api/auth", authRoutes);
 
-mongoose.set('strictQuery', false)
+const saucesRoutes = require("./routes/saucesRoutes");
+app.use("/api/sauces", saucesRoutes);
+
+mongoose.set("strictQuery", false);
 mongoose
   .connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
@@ -70,4 +72,3 @@ server.on("listening", () => {
   const bind = typeof address === "string" ? "pipe " + address : "port " + port;
   console.log("Listening on " + bind);
 });
-
