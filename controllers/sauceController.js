@@ -1,13 +1,13 @@
-const { json } = require("express");
 const Sauce = require("../models/SauceModel");
 
 //Création de la Sauce
 exports.createSauce = (req, res, next) => {
-  const sauceObjet = json.parse(req.body.sauce);
-  // delete sauceObject._id;
-  // delete sauce._userId;
+  const sauceObjet = JSON.parse(req.body.sauce);
+  delete sauceObjet._id;//id et userid supprimés pour sécuriser la connexion utilisateur
+  delete sauce._userId;
   const sauce = new Sauce({
     ...sauceObjet,
+    _userId:req.auth._userId,
     imageUrl: `${req.protocol}://${req.get("host")}/public/images/${
       req.file.filename
     }`,
