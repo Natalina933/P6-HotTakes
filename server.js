@@ -13,8 +13,8 @@ app.use(cors());
 const authRoutes = require("./routes/authRoutes");
 app.use("/api/auth", authRoutes);
 
-// const saucesRoutes = require("./routes/saucesRoutes");
-// app.use("/api/sauces", saucesRoutes);
+const saucesRoutes = require("./routes/saucesRoutes");
+app.use("/api/sauces", saucesRoutes);
 
 // app.use("/public/images", express.static(path.join(__dirname, "images"))); // gestion images de manière statiques
 

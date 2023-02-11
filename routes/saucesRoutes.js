@@ -1,8 +1,8 @@
 const { Router } = require("express");
 const express = require("express");
 const router = express.Router();
-const auth = require("../middleware/auth"); // Authentifier les pages du site (middleware)
-const multer = require("../middleware/multer-config"); // destination des images (middleware)
+const auth = require("../middlewares/auth"); // Authentifier les pages du site (middleware)
+const multer = require("../middlewares/multer-config"); // destination des images (middleware)
 
 const {
   createSauce,
