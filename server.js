@@ -16,8 +16,7 @@ app.use("/api/auth", authRoutes);
 const saucesRoutes = require("./routes/saucesRoutes");
 app.use("/api/sauces", saucesRoutes);
 
-const path = require("path");
-app.use("/images", express.static(path.join(__dirname, "images"))); // gestion images de manière statiques
+app.use(express.static("./public")); // gestion images de manière statiques
 
 mongoose.set("strictQuery", false);
 mongoose
