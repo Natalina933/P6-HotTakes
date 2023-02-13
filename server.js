@@ -1,27 +1,32 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const saucesRoutes = require("./routes/saucesRoutes");
+const authRoutes = require("./routes/authRoutes");
+const path = require("path");
+// const helmet = require("helmet");
 const app = express();
+const cors = require("cors");// CORS - partage de ressources entre serveurs
+
 app.use(
   express.urlencoded({
     extended: true,
   })
 );
 app.use(express.json());
-const cors = require("cors");
+
 app.use(cors());
 
-const authRoutes = require("./routes/authRoutes");
 app.use("/api/auth", authRoutes);
 
-const saucesRoutes = require("./routes/saucesRoutes");
 app.use("/api/sauces", saucesRoutes);
 
-const path = require("path");
 app.use(
   "/public/images",
   express.static(path.join(__dirname, "public/images"))
 ); // gestion images de manière statiques
 
+
+// mongoose connect
 mongoose.set("strictQuery", false);
 mongoose
   .connect(process.env.MONGODB_URL, {
@@ -30,6 +35,12 @@ mongoose
   })
   .then(() => console.log("Connexion à MongoDB réussie !"))
   .catch(() => console.log("Connexion à MongoDB échouée !"));
+
+  // app.use(mongoSanitize()); // En prévention des injections
+  // app.use(helmet()); // helmet
+  
+  // app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+  
 
 /****************return of a valid port provided in the form of a number or a string**************/
 const normalizePort = (val) => {

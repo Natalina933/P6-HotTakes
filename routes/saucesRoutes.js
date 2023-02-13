@@ -14,8 +14,8 @@ const {
 } = require("../controllers/sauceController");
 
 router.post("/", auth, multer, createSauce);
-// router.put("/:id", modifySauce);
-// router.delete("/:id", deleteSauce);
+router.put("/:id", auth, multer, modifySauce);
+router.delete("/:id", auth, deleteSauce);
 // router.post("/:id/like", likeSauce);
 
 router.get("/", multer, getAllSauces);
