@@ -12,28 +12,29 @@ exports.createSauce = (req, res, next) => {
       req.file.filename
     }`,
   }); // url de l'image enregistrer dans la bdd et dans le fichier images
-  sauce
-    .save() // la sauce est sauvegardée dans la bdd
-    .then(() => {
-      res.status(201).json({ message: "Sauce enregistrée !" });
-    })
-    .catch((error) => {
-      res.status(400).json({ error });
-    });
+  sauce    
+  .save() // la sauce est sauvegardée dans la bdd
+  
+  .then(() => {
+    res.status(201).json({ message: "Sauce enregistrée !" });
+  })
+  .catch((error) => {
+    res.status(400).json({ error});
+  });
 };
 
-exports.getAllSauces = (req, res, next) => {
-  // Récupération de toutes les sauces
-  Sauce.find()
-    .then((sauces) => res.status(200).json(sauces))
-    .catch((error) => res.status(400).json({ error }));
-};
+// exports.getAllSauces = (req, res, next) => {
+//   // Récupération de toutes les sauces
+//   Sauce.find()
+//     .then((sauces) => res.status(200).json(sauces))
+//     .catch((error) => res.status(400).json({ error }));
+// };
 
-exports.getOneSauce = (req, res, next) => {
-  // Récupération d'une seule sauce
-  Sauce.findOne({ _id: req.params.id })
-    .then((sauce) => res.status(200).json(sauce))
-    .catch((error) => res.status(404).json({ error }));
-};
+// exports.getOneSauce = (req, res, next) => {
+//   // Récupération d'une seule sauce
+//   Sauce.findOne({ _id: req.params.id })
+//     .then((sauce) => res.status(200).json(sauce))
+//     .catch((error) => res.status(404).json({ error }));
+// };
 
 
