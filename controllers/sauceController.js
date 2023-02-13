@@ -3,11 +3,11 @@ const Sauce = require("../models/SauceModel");
 //Création de la Sauce
 exports.createSauce = (req, res, next) => {
   const sauceObjet = JSON.parse(req.body.sauce);
-  delete sauceObjet._id;//id et userid supprimés pour sécuriser la connexion utilisateur
-  delete sauce._userId;
+  // delete sauceObjet.id;//id et userid supprimés pour sécuriser la connexion utilisateur
+  // delete sauce.userId;
   const sauce = new Sauce({
     ...sauceObjet,
-    _userId:req.auth._userId,
+    userId:req.auth.userId,
     imageUrl: `${req.protocol}://${req.get("host")}/public/images/${
       req.file.filename
     }`,

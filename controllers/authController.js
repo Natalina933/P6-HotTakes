@@ -1,6 +1,8 @@
 const User = require("../models/UserModel"); // modele Utilisateur
 const bcrypt = require("bcrypt"); // hashage password
 const jwt = require("jsonwebtoken"); // token generator package
+require("dotenv").config()
+
 
 // connexion de l'utilisateur
 const signup = async (req, res, next) => {
