@@ -19,6 +19,6 @@ router.post("/", auth, multer, createSauce);
 // router.post("/:id/like", likeSauce);
 
 router.get("/", multer, getAllSauces);
-router.get("/:id", getOneSauce);
+// router.get("/:id", getOneSauce);
 
 module.exports = router;
