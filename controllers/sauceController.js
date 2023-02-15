@@ -47,7 +47,7 @@ exports.modifySauce=(req, res, next) =>{
       }
     : { ...req.body };
     
-     delete sauceObject._userId;
+    delete sauceObject._userId;
     Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
       if (sauce.userId != req.auth.userId) {
@@ -56,7 +56,7 @@ exports.modifySauce=(req, res, next) =>{
       } else {
         console.log("utilisateur vérifié");
         const filename = sauce.imageUrl.split("/public/images/")[1];
-        fs.unlink(`images/${filename}`, () => {
+        fs.unlink(`public/images/${filename}`, () => {
           Sauce.updateOne(
             { _id: req.params.id },
             { ...sauceObject, _id: req.params.id }
@@ -76,27 +76,69 @@ exports.modifySauce=(req, res, next) =>{
     }
 
 exports.deleteSauce=(req, res, next)=> {
- Sauce.findOne({ _id: req.params.id })
-   .then((sauce) => {
-     if (sauce.userId != req.auth.userId) {
-       res.status(401).json({ message: "Non-autorisé" });
-       return false;
-     } else {
-       const filename = sauce.imageUrl.split("/images/")[1];
-       fs.unlink(`images/${filename}`, () => {
-         Sauce.deleteOne({ _id: req.params.id })
-           .then(() => res.status(200).json({ message: "Sauce supprimée !" }))
-           .catch((error) => {
-             console.log(error);
-             res.status(401).json({ error });
-           });
-       });
-     }
-   })
-   .catch((error) => {
-     console.log(error);
-     res.status(500).json({ error });
-   });
+  Sauce.findOne({ _id: req.params.id })
+    .then((sauce) => {
+      if (sauce.userId != req.auth.userId) {
+      return   res.status(401).json({ message: "Non-autorisé" });
+      }else {
+        const filename = sauce.imageUrl.split("/images/")[1];
+        fs.unlink(`images/${filename}`, () => {
+          Sauce.deleteOne({ _id: req.params.id })
+            .then(() => res.status(200).json({ message: "Sauce supprimée !" }))
+            .catch((error) => {
+              console.log(error);
+              res.status(401).json({ error });
+            });
+        });
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+      res.status(500).json({ error });
+    });
 }
 
+//Boutons Like et dislike
+
+exports.likeSauce=(req,res,next)=>{
+  const like= req.body.like;
+  if (like===1){
+    //si like $inc=opérateur incrémente
+    Sauce.updateOne( {_id:req.params.id},{
+    $inc:{likes:1}, $push:{userLike:req.body.userId}
+
+    })
+    .then(() => res.status(200).json({ message: "Vous avez aimé cette sauce !" }))
+    .catch((error) => {
+      console.log(error);
+      res.status(401).json({ error });
+    });
+
+  }
+
+  else if(req.body.like===-1){
+  //si dislike
+    try {
+      Sauce.updateOne(
+        {_id:req.params.id},
+        {$inc:{dislikes:1}, $push:{userDisliked:req.body.userId}}
+      )
+      .then(() => res.status(200).json({ message: "Vous n'avez pas aimé cette sauce !" }))
+      .catch((error) => {
+        console.log(error);
+        res.status(401).json({ error });
+      });
+  
+    } catch (error) {
+      console.log(error);
+    }
+  }else{
+    Sauce.findOne({_id:req.params.id}).then((resultat)=>{
+      if (res)
+    })
+  
+  }
+//si changement d'avis
+
+}
 
