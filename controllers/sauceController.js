@@ -47,15 +47,15 @@ exports.modifySauce = (req, res, next) => {
       }
     : { ...req.body };
 
-  delete sauceObject._userId;
+  delete sauceObject_userId;
   Sauce.findOne({ _id: req.params.id })
     .then((sauce) => {
-      if (sauce.userId != req.auth.userId) {
+      if (sauce.userId !== req.auth.userId) {
         res.status(403).json({ message: "Utilisateur non identifié" });
         return false;
       } else {
         console.log("utilisateur vérifié");
-        const filename = sauce.imageUrl.split("./public/images/")[1];
+        const filename = sauce.imageUrl.split("/public/images/")[1];
         fs.unlink(`./public/images/${filename}`, () => {
           Sauce.updateOne(
             { _id: req.params.id },
@@ -82,7 +82,7 @@ exports.deleteSauce = (req, res, next) => {
         res.status(401).json({ message: "Non-autorisé" });
         return false;
       } else {
-        const filename = sauce.imageUrl.split("./public/images/")[1];
+        const filename = sauce.imageUrl.split("/public/images/")[1];
         fs.unlink(`./public/images/${filename}`, () => {
           Sauce.deleteOne({ _id: req.params.id })
             .then(() => res.status(200).json({ message: "Sauce supprimée !" }))
@@ -100,41 +100,40 @@ exports.deleteSauce = (req, res, next) => {
 };
 
 //Boutons Like et dislike
-
 exports.likeSauce = async (req, res, next) => {
+  console.log(req);
   const userId = req.auth.userId;
   const like = req.body.like;
   try {
     const sauce = await Sauce.findOne({ _id: req.params.id });
     if (like === 1) {
-      //je vérifie si j'ai déjà like
+      // Si j'ai déjà liké, j'envoie un message d'erreur
       const hasAlreadyLiked = sauce.usersLiked.find((u) => userId === u);
       if (hasAlreadyLiked)
         return res
           .status(200)
           .json({ message: "Vous avez déjà liké cette sauce!" });
-      //je vérifie si j'ai déjà dislike
-      const hasAlreadyDisliked = sauce.userDisliked.find((u) => userId === u);
+      // Si j'ai déjà dislike,
+      const hasAlreadyDisliked = sauce.usersDisliked.find((u) => userId === u);
       if (hasAlreadyDisliked) {
         //j'annule mon dislike
         sauce.dislikes = sauce.dislikes - 1;
-        const index = sauce.userDisliked.findIndex((u) => userId === u);
-        sauce.userDisliked.splice(index, 1);
+        const index = sauce.usersDisliked.findIndex((u) => userId === u);
+        sauce.usersDisliked.splice(index, 1);
       }
-      //j'ajoute mon like
+      //Je like
       sauce.likes = sauce.likes + 1;
       sauce.usersLiked.push(userId);
-
       await sauce.save();
-      return res.status(200).json({ message: "Vous avez liké cette sauce!" });
+      return res.status(200).json({ message: "Vous avez aimé cette sauce!" });
     } else if (like === -1) {
-      //je vérifie si j'ai déjà dislike
-      const hasAlreadyDisliked = sauce.userDisliked.find((u) => userId === u);
+      // Si j'ai déjà dislike, j'envoie un message d'erreur
+      const hasAlreadyDisliked = sauce.usersDisliked.find((u) => userId === u);
       if (hasAlreadyDisliked)
         return res
           .status(200)
           .json({ message: "Vous avez déjà disliké cette sauce!" });
-      //je vérifie si j'ai liké
+      // Si j'ai déjà liké,
       const hasAlreadyLiked = sauce.usersLiked.find((u) => userId === u);
       if (hasAlreadyLiked) {
         //j'annule mon like
@@ -143,18 +142,18 @@ exports.likeSauce = async (req, res, next) => {
         sauce.usersLiked.splice(index, 1);
       }
       //j'ajoute mon dislike
-      sauce.dislikes = sauce.dislikes - 1;
-      sauce.userDisliked.push(userId);
+      sauce.dislikes = sauce.dislikes + 1;
+      sauce.usersDisliked.push(userId);
 
       await sauce.save();
       return res
         .status(200)
         .json({ message: "Vous avez disliké cette sauce!" });
     } else {
-      //Est ce que j'avais like ou dislike la sauce ?
+      // Si j'ai liké la sauce,
       const hasAlreadyLiked = sauce.usersLiked.find((u) => userId === u);
       if (hasAlreadyLiked) {
-        //je dois annuler le like de la sauce
+        //je dois annuler le like
         sauce.likes = sauce.likes - 1;
         const index = sauce.usersLiked.findIndex((u) => userId === u);
         sauce.usersLiked.splice(index, 1);
@@ -163,18 +162,19 @@ exports.likeSauce = async (req, res, next) => {
           .status(200)
           .json({ message: "Vous avez annulé votre like!" });
       }
-      const hasAlreadyDisliked = sauce.userDisliked.find((u) => userId === u);
+      // Si j'ai disliké la sauce,
+      const hasAlreadyDisliked = sauce.usersDisliked.find((u) => userId === u);
       if (hasAlreadyDisliked) {
-        //je dois annuler le dislike de la sauce
+        //je dois annuler le dislike
         sauce.dislikes = sauce.dislikes - 1;
-        const index = sauce.userDisliked.findIndex((u) => userId === u);
-        sauce.userDisliked.splice(index, 1);
+        const index = sauce.usersDisliked.findIndex((u) => userId === u);
+        sauce.usersDisliked.splice(index, 1);
         await sauce.save();
         return res
           .status(200)
           .json({ message: "Vous avez annulé votre dislike!" });
       }
-
+      // Sinon, rien n'a été annulé
       return res.status(200).json({ message: "Vous n'avez rien annulé!" });
     }
   } catch (error) {
